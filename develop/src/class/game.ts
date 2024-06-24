@@ -25,6 +25,7 @@ export default class Game {
 
   private readonly _mainTimer: number;
   private readonly _cometTimer: number;
+  private readonly _subTimer: number;
   private _shotTimer: number;
   private _meteoTimer: number;
   private _shotInterval: number;
@@ -72,6 +73,7 @@ export default class Game {
     this._meteoInterval = 2000;
 
     this._mainTimer = setInterval(this.mainTimer.bind(this), 50);
+    this._subTimer = setInterval(this.subTimer.bind(this), 2000);
     this._shotTimer = setInterval(this.createShot.bind(this), this._shotInterval);
     this._cometTimer = setInterval(this.createComet.bind(this), 5000);
     this._meteoTimer = setInterval(this.createMeteo.bind(this), this._meteoInterval);
@@ -82,6 +84,10 @@ export default class Game {
     this.checkBoundary();
     this.detectCollision();
     this.save()
+  }
+
+  private subTimer(): void {
+    this.reduceFuel(1);
   }
   
   /**
@@ -101,6 +107,15 @@ export default class Game {
       this._level++;
       this._levelBoard.level = this._level;
     }
+  }
+
+  /**
+   * Reduce fuel
+   * @param fuel Decrease fuel
+   */
+  private reduceFuel(fuel: number): void {
+    this._fuel -= fuel;
+    this._fuelBoard.fuel = this._fuel;
   }
   
   private checkBoundary(): void {
@@ -184,7 +199,7 @@ export default class Game {
       x_array.push(this._player.position.x)
       x_array.push(this._player.position.x + size.x);
       x_array.push(this._player.position.x + size.x * 2);
-      x_array.push(this._player.position.x - size.x * 3);
+      x_array.push(this._player.position.x + size.x * 3);
       v_array.push({ x: -6, y: 20 });
       v_array.push({ x: -4, y: 20 });
       v_array.push({ x: -2, y: 20 });

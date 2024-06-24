@@ -5,7 +5,11 @@ export default class Fuel extends TextObject {
   protected _fuel: number;
 
   set fuel(fuel: number) {
-    this._fuel = fuel;
+    if (fuel < 0) {
+      this._fuel = 0;
+    } else {
+      this._fuel = fuel;
+    }
   }
 
   constructor(params: FuelParams) {
