@@ -1,5 +1,6 @@
 import { Util } from "../utility/util.js";
 import Comet from "./comet.js";
+import Fuel from "./fuel.js";
 import KeyBoard from "./keyboard.js";
 import Level from "./level.js";
 import Meteo from "./meteo.js";
@@ -14,8 +15,10 @@ export default class Game {
     _meteos;
     _score;
     _level;
+    _fuel;
     _scoreBoard;
     _levelBoard;
+    _fuelBoard;
     _mainTimer;
     _cometTimer;
     _shotTimer;
@@ -27,6 +30,7 @@ export default class Game {
             position: { x: Screen.width / 2, y: 45 },
             size: { x: 100, y: 90 },
             speed: 20,
+            fuel: 20,
             keyboard: new KeyBoard(),
         });
         this._shots = [];
@@ -45,6 +49,13 @@ export default class Game {
             fontName: "Bungee Inline",
             fontSize: 24,
             level: this._level,
+        });
+        this._fuel = 20;
+        this._fuelBoard = new Fuel({
+            position: { x: Screen.width - 200, y: Screen.height - 25 },
+            fontName: "Bungee Inline",
+            fontSize: 40,
+            fuel: this._fuel,
         });
         this.load();
         this._shotInterval = 1000;

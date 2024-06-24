@@ -2,6 +2,7 @@ import { Util } from "../utility/util.js";
 import MovableObject from "./movableObject.js";
 export default class Player extends MovableObject {
     _speed;
+    _fuel;
     _keyboard;
     constructor(params) {
         super({
@@ -13,6 +14,7 @@ export default class Player extends MovableObject {
             acceleration: { x: 0, y: 0 },
             ...params,
         });
+        this._fuel = params.fuel;
         this._speed = params.speed;
         this._keyboard = params.keyboard;
     }

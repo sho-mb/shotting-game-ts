@@ -5,6 +5,7 @@ import MovableObject from "./movableObject.js";
 
 export default class Player extends MovableObject {
   protected _speed: number;
+  protected _fuel: number;
   protected readonly _keyboard: KeyBoard;
 
   constructor(params: PlayerParams) {
@@ -17,6 +18,7 @@ export default class Player extends MovableObject {
       acceleration: { x: 0, y: 0 },
       ...params,
     });
+    this._fuel = params.fuel;
     this._speed = params.speed;
     this._keyboard = params.keyboard;
   }
