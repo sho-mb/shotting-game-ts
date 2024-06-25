@@ -1,6 +1,7 @@
 import { Util } from "../utility/util.js";
 import Comet from "./comet.js";
 import Fuel from "./fuel.js";
+import FuelPack from "./fuelPack.js";
 import KeyBoard from "./keyboard.js";
 import Level from "./level.js";
 import Meteo from "./meteo.js";
@@ -13,9 +14,9 @@ export default class Game {
     _shots;
     _comets;
     _meteos;
+    _fuelPacks;
     _score;
     _level;
-    _fuel;
     _scoreBoard;
     _levelBoard;
     _fuelBoard;
@@ -24,19 +25,21 @@ export default class Game {
     _fuelTimer;
     _shotTimer;
     _meteoTimer;
+    _fuelInterval;
     _shotInterval;
     _meteoInterval;
     constructor() {
         this._player = new Player({
             position: { x: Screen.width / 2, y: 45 },
             size: { x: 100, y: 90 },
-            speed: 20,
             fuel: 20,
+            initialSpeed: 20,
             keyboard: new KeyBoard(),
         });
         this._shots = [];
         this._meteos = [];
         this._comets = [];
+        this._fuelPacks = [];
         this._score = 0;
         this._scoreBoard = new Score({
             position: { x: 25, y: Screen.height - 25 },
@@ -51,30 +54,28 @@ export default class Game {
             fontSize: 24,
             level: this._level,
         });
-        this._fuel = 20;
         this._fuelBoard = new Fuel({
             position: { x: Screen.width - 200, y: Screen.height - 25 },
             fontName: "Bungee Inline",
             fontSize: 40,
-            fuel: this._fuel,
+            fuel: this._player._fuel,
         });
         this.load();
         this._shotInterval = 1000;
         this._meteoInterval = 2000;
+        this._fuelInterval = 5000;
         this._mainTimer = setInterval(this.mainTimer.bind(this), 50);
-        this._fuelTimer = setInterval(this.subTimer.bind(this), 2000);
         this._shotTimer = setInterval(this.createShot.bind(this), this._shotInterval);
         this._cometTimer = setInterval(this.createComet.bind(this), 5000);
         this._meteoTimer = setInterval(this.createMeteo.bind(this), this._meteoInterval);
+        this._fuelTimer = setInterval(this.createFuel.bind(this), this._fuelInterval);
     }
     mainTimer() {
         this.addScore(1);
+        this.checkFuel();
         this.checkBoundary();
         this.detectCollision();
         this.save();
-    }
-    subTimer() {
-        this.reduceFuel(2);
     }
     /**
      * Add score
@@ -93,12 +94,21 @@ export default class Game {
         }
     }
     /**
-     * Reduce fuel
-     * @param fuel Decrease fuel
+     * Update fuel
+     * @param fuel update fuel
      */
-    reduceFuel(fuel) {
-        this._fuel -= fuel;
-        this._fuelBoard.fuel = this._fuel;
+    updateFuel() {
+        this._fuelBoard.fuel = this._player._fuel;
+    }
+    checkFuel() {
+        this.updateFuel();
+        if (this._player._fuel <= 0) {
+            clearInterval(this._shotTimer);
+            this._shotTimer = 0;
+        }
+        else if (this._player._fuel > 0 && this._shotTimer <= 0) {
+            this._shotTimer = setInterval(this.createShot.bind(this), this._shotInterval);
+        }
     }
     checkBoundary() {
         this._shots.forEach((shot) => {
@@ -114,6 +124,11 @@ export default class Game {
         this._meteos.forEach((meteo) => {
             if (Util.isOutsideScreen(meteo)) {
                 Util.removeObject(meteo, this._meteos);
+            }
+        });
+        this._fuelPacks.forEach((pack) => {
+            if (Util.isOutsideScreen(pack)) {
+                Util.removeObject(pack, this._fuelPacks);
             }
         });
     }
@@ -135,6 +150,17 @@ export default class Game {
                     Util.removeObject(shot, this._shots);
                     break;
                 }
+            }
+        });
+        this._meteos.forEach((meteo) => {
+            if (Util.isCollding(this._player, meteo, 50)) {
+                this._player.reduceFuel(5);
+            }
+        });
+        this._fuelPacks.forEach((pack) => {
+            if (Util.isCollding(this._player, pack, 30)) {
+                Util.removeObject(pack, this._fuelPacks);
+                this._player._fuel += 20;
             }
         });
     }
@@ -248,6 +274,27 @@ export default class Game {
             [acceleration.x, acceleration.y] = [0.6, -0.3];
         }
         this._comets.push(new Comet({
+            position: position,
+            velocity: velocity,
+            acceleration: acceleration,
+            size: size,
+        }));
+    }
+    createFuel() {
+        const size = { x: 100, y: 100 };
+        const position = {
+            x: Util.random(0, Screen.width),
+            y: Screen.height + 75,
+        };
+        const velocity = {
+            x: Util.random(-2, -1),
+            y: Util.random(-1, 1),
+        };
+        const acceleration = {
+            x: 0,
+            y: Util.random(-1, 0),
+        };
+        this._fuelPacks.push(new FuelPack({
             position: position,
             velocity: velocity,
             acceleration: acceleration,
