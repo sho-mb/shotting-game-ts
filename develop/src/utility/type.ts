@@ -41,11 +41,17 @@ export type ScoreParams = Omit<TextObjectParams, "text"> & {
   score: number;
 }
 
+export type FuelParams = Omit<TextObjectParams, "text"> & {
+  fuel: number;
+}
+
 export type LevelParams = Omit<TextObjectParams, "text"> & {
   level: number;
 }
 
 export type CometParams = Omit<MovableObjectParams, "element">;
+
+export type FuelPackParams = Omit<MovableObjectParams, "element">;
 
 export type MeteoParams = Omit<MovableObjectParams, "element"> & {
   power: number;
@@ -56,7 +62,8 @@ export type ShotParams = Omit<MovableObjectParams, "element"> & {
 }
 
 export type PlayerParams = Omit<MovableObjectParams, "element" | "velocity" | "acceleration"> & {
-  speed: number;
+  fuel: number;
+  initialSpeed: number;
   keyboard: KeyBoard;
 }
 
